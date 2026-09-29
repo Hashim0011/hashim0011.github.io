@@ -1,0 +1,533 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Arabic display face
+
+   "The Year of Handicrafts" carries no Latin letters at all: it has the
+   digits and the punctuation, and nothing from A-Z. Every Latin run inside
+   Arabic copy on this site — React, TypeScript, Supabase, n8n, the email
+   address — therefore falls through to the next family in the stack, which
+   is exactly what should happen. `unicode-range` states that explicitly so
+   the browser never even downloads this file for a Latin-only page.
+
+   It also ships in one weight. Everything below manages that.
+------------------------------------------------------------------ */
+@font-face {
+  font-family: "The Year of Handicrafts";
+  src: url("/fonts/the-year-of-handicrafts.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  /* Arabic block, presentation forms, Arabic-Indic digits and the Arabic
+     comma and question mark. Latin is deliberately absent. */
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF;
+  font-display: swap;
+}
+
+/* ------------------------------------------------------------------
+   Design tokens
+------------------------------------------------------------------ */
+@theme {
+  --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* ----------------------------------------------------------------
+     LIGHT is the base palette. Dark overrides it further down under
+     [data-theme="dark"]. Every token keeps its ROLE in both themes and
+     only flips its value, which is why no component needs to know which
+     theme is running:
+
+       ink-900  the page          ink-950  recessed below the page
+       ink-500  strongest rule    mist-100 loudest text
+       mist-600 quietest text
+  ---------------------------------------------------------------- */
+  --color-ink-950: #e6e9ee;
+  --color-ink-900: #f5f6f8;
+  --color-ink-850: #eef0f4;
+  --color-ink-800: #e9ecf1;
+  --color-ink-700: #e2e6ec;
+  --color-ink-600: #c7cdd7;
+  --color-ink-500: #aab2be;
+
+  --color-mist-100: #12151a;
+  --color-mist-300: #383e48;
+  --color-mist-500: #565c67;
+  --color-mist-600: #656b78;
+
+  /* One emerald, one hue (159°), one saturation (0.92). Only the value
+     moves between themes — deep on white, light on near-black — so the
+     accent reads as the same colour while always clearing 4.5:1 for the
+     11-14px labels it has to carry.
+
+       -500  the accent that carries TEXT and icons
+       -400  bright end of gradients and the pulse dots (never text)
+       -600  deep end of gradients */
+  --color-brand-500: #0a7a52;
+  --color-brand-400: #0e9463;
+  --color-brand-600: #06563a;
+  --brand-rgb: 10 122 82;
+
+  /* Whatever sits on top of a brand-500 fill. */
+  --color-on-brand: #ffffff;
+
+  /* Rules and dividers. These used to be white-at-low-alpha, which simply
+     is not there on a white page — hence a token that flips. */
+  --color-rule: rgb(18 21 26 / 0.1);
+  --color-rule-strong: rgb(18 21 26 / 0.16);
+
+  /* Scrim dims the page behind the project dialog, so it stays dark in
+     both themes; veil dims the project thumbnails on hover and those are
+     dark artwork in both themes too. */
+  --color-scrim: rgb(18 21 26 / 0.45);
+  --color-veil: #0c0e12;
+
+  /* Relief, lit from the top left. */
+  --shadow-lift: 10px 10px 20px #d7dce4, -10px -10px 20px #ffffff;
+  --shadow-lift-sm: 6px 6px 14px #dae0e7, -6px -6px 14px #ffffff;
+  --shadow-inset: inset 6px 6px 12px #dfe4eb, inset -6px -6px 12px #ffffff;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Surfaces and atmosphere that are painted rather than filled with a token.
+   Held as plain custom properties (not @theme) because nothing needs a
+   Tailwind utility for them — only .panel, .chip and .backdrop-mesh read them. */
+:root {
+  --surface-panel: linear-gradient(145deg, #ffffff, #eef1f5);
+  --surface-flat: linear-gradient(145deg, #f2f4f8, #fbfcfd);
+  --shadow-chip: 4px 4px 9px #d9dee6, -4px -4px 9px #ffffff;
+
+  --mesh-line: rgb(15 23 30 / 0.055);
+  /* The same emerald that reads as atmosphere over near-black turns into a
+     stain over white, so the blooms run at roughly a third of the alpha. */
+  --bloom-a: 0.1;
+  --bloom-b: 0.07;
+  --bloom-c: 0.08;
+  --bloom-d: 0.07;
+  /* Dark speckle on white is far more visible than light speckle on black. */
+  --grain-a: 0.018;
+
+  /* The portrait is a bright exposure: median luminance 221/255, with 55% of
+     the subject above 200. Nothing is clipped, so a plain multiply is the right
+     tool — it scales the hot thobe down meaningfully while the deep shadows,
+     already at 7, barely move. */
+  --portrait-brightness: 0.96;
+}
+
+[data-theme="dark"] {
+  --surface-panel: linear-gradient(145deg, #15181f, #101318);
+  --surface-flat: linear-gradient(145deg, #121519, #16191f);
+  --shadow-chip: 4px 4px 9px #0a0c0f, -4px -4px 9px #1c212a;
+
+  --mesh-line: rgb(255 255 255 / 0.032);
+  --bloom-a: 0.22;
+  --bloom-b: 0.14;
+  --bloom-c: 0.16;
+  --bloom-d: 0.13;
+  --grain-a: 0.035;
+  /* Lower against the dark page, where the same photo reads hotter. */
+  --portrait-brightness: 0.91;
+}
+
+/* ------------------------------------------------------------------
+   Dark theme
+
+   Same tokens, same roles, values turned over. The accent lands at 5.04:1
+   on the page here against 4.96:1 on the light page, so the green carries
+   the same weight in both.
+------------------------------------------------------------------ */
+[data-theme="dark"] {
+  --color-ink-950: #0c0e12;
+  --color-ink-900: #101216;
+  --color-ink-850: #15181e;
+  --color-ink-800: #191c22;
+  --color-ink-700: #1f232b;
+  --color-ink-600: #262b34;
+  --color-ink-500: #333945;
+
+  --color-mist-100: #f4f5f7;
+  --color-mist-300: #c8ccd4;
+  --color-mist-500: #8b909b;
+  --color-mist-600: #7d818c;
+
+  --color-brand-500: #0d9768;
+  --color-brand-400: #0fbb7e;
+  --color-brand-600: #09734d;
+  --brand-rgb: 13 151 104;
+
+  --color-on-brand: #071410;
+
+  --color-rule: rgb(255 255 255 / 0.06);
+  --color-rule-strong: rgb(255 255 255 / 0.1);
+
+  --color-scrim: rgb(8 10 13 / 0.85);
+
+  --shadow-lift: 10px 10px 20px #0a0c0f, -10px -10px 20px #1c212a;
+  --shadow-lift-sm: 6px 6px 14px #0a0c0f, -6px -6px 14px #1b2029;
+  --shadow-inset: inset 6px 6px 12px #0a0c0f, inset -6px -6px 12px #1c212a;
+}
+
+/* Native widgets — scrollbars, form controls, focus rings — need telling. */
+:root {
+  color-scheme: light;
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------
+   Base
+------------------------------------------------------------------ */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* Decorative glows are wider than the phone they sit on — clip, never scroll. */
+    overflow-x: clip;
+  }
+
+  /* Lenis drives the scrolling — native smooth-scroll would fight it. */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-ink-900);
+    color: var(--color-mist-300);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    font-family: var(--font-display);
+    color: var(--color-mist-100);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin: 0;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  ::selection {
+    background: var(--color-brand-500);
+    color: var(--color-on-brand);
+  }
+
+  ::-webkit-scrollbar {
+    width: 9px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-ink-950);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-ink-600);
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-brand-500);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Reusable pieces
+------------------------------------------------------------------ */
+@layer components {
+  /* ----------------------------------------------------------------
+     Site backdrop: a fine lattice under soft emerald blooms.
+
+     Fixed rather than scrolled, so the grid stays optically still and the
+     content reads as floating over it. Both layers are masked, because an
+     unmasked lattice edge-to-edge looks like graph paper rather than depth.
+  ---------------------------------------------------------------- */
+  .backdrop-mesh {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background-color: var(--color-ink-900);
+  }
+
+  .backdrop-mesh::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--mesh-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--mesh-line) 1px, transparent 1px);
+    background-size: 74px 74px;
+    -webkit-mask-image: radial-gradient(ellipse 105% 70% at 50% 32%, #000 25%, transparent 80%);
+    mask-image: radial-gradient(ellipse 105% 70% at 50% 32%, #000 25%, transparent 80%);
+  }
+
+  .backdrop-mesh::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(52% 46% at 14% 8%, rgb(var(--brand-rgb) / var(--bloom-a)), transparent 72%),
+      radial-gradient(46% 40% at 90% 22%, rgb(var(--brand-rgb) / var(--bloom-b)), transparent 74%),
+      radial-gradient(60% 50% at 66% 98%, rgb(var(--brand-rgb) / var(--bloom-c)), transparent 74%),
+      radial-gradient(40% 34% at 2% 78%, rgb(28 96 122 / var(--bloom-d)), transparent 74%);
+  }
+
+  .shell {
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+
+  /* Soft-relief panel — the signature surface of the whole site. Kept dark
+     enough that brand-500 text on it still clears AA; the lift comes from the
+     shadow pair, not from the surface being light. */
+  .panel {
+    background: var(--surface-panel);
+    border-radius: 10px;
+    box-shadow: var(--shadow-lift);
+  }
+
+  .panel-flat {
+    background: var(--surface-flat);
+    border-radius: 10px;
+    box-shadow: var(--shadow-lift-sm);
+  }
+
+  .eyebrow {
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--color-brand-500);
+  }
+
+  .lead {
+    max-width: 58ch;
+    color: var(--color-mist-500);
+  }
+
+  /* Pill / icon buttons in the hero and footer */
+  .chip {
+    display: grid;
+    place-items: center;
+    width: 45px;
+    height: 45px;
+    border-radius: 6px;
+    color: var(--color-mist-500);
+    background: var(--surface-panel);
+    box-shadow: var(--shadow-chip);
+    transition: color 0.3s var(--ease-out-soft), transform 0.3s var(--ease-out-soft),
+      box-shadow 0.3s var(--ease-out-soft);
+  }
+  .chip:hover {
+    color: var(--color-brand-500);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-inset);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: var(--grain-a);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .mask-fade-x {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  }
+}
+
+/* ------------------------------------------------------------------
+   Keyframes
+------------------------------------------------------------------ */
+@keyframes caret {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  95% {
+    opacity: 0;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.55;
+  }
+  70% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Arabic
+
+   Two things break Arabic that never come up in a Latin-only build:
+
+   1. letter-spacing. Arabic is cursive — the letters of a word are joined.
+      Spacing pulls those joins apart and the word stops reading as a word.
+      This site leans on tracking heavily (every eyebrow, nav item and button
+      is 0.16em to 0.3em, and headings carry -0.02em), so it has to be undone
+      wholesale rather than case by case.
+   2. Vertical rhythm. Arabic has taller ascenders and deeper descenders than
+      Latin at the same size, so display line-heights tuned for Poppins clip.
+
+   Unlayered so it outranks the utilities that set the tracking.
+------------------------------------------------------------------ */
+[lang="ar"] {
+  /* Handicrafts first, Tajawal behind it for the few Arabic codepoints it does
+     not cover, then the Latin faces — which is what actually renders "React"
+     and "n8n" inside an Arabic sentence. */
+  --font-display: "The Year of Handicrafts", "Tajawal", "Poppins", ui-sans-serif, sans-serif;
+  --font-sans: "The Year of Handicrafts", "Tajawal", "Inter", ui-sans-serif, sans-serif;
+}
+
+/* The face ships in a single weight. Left alone, the browser fakes 500 to 800
+   by smearing the outlines sideways, which on joined Arabic script thickens the
+   connections until words start to close up. Refusing the fake keeps the letter-
+   forms honest; the design already separates heading from body by size, colour
+   and spacing, so nothing is lost by not also faking a bolder cut. */
+[lang="ar"] {
+  font-synthesis-weight: none;
+  font-synthesis: none;
+}
+
+/* Arabic is cursive, and the joining and the marks come from the font's own
+   tables. `rlig` and `calt` are required rather than optional here: without
+   them letters stop connecting. `kern` and the mark features place the
+   diacritics. This is the baseline for every Arabic run on the site. */
+[lang="ar"] {
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures contextual;
+  font-feature-settings: "rlig" 1, "calt" 1, "liga" 1, "kern" 1, "mark" 1, "mkmk" 1;
+}
+
+/* The kashida.
+   `ss01` swaps 432 letters for their elongated cuts — it is the face's
+   stretched, decorative register. Across a paragraph it reads as noise: the
+   connections lengthen unevenly, word shapes stop being uniform, and small text
+   gets harder to scan. At heading size it is the whole reason to use a display
+   Arabic face at all.
+   So it goes on the two display sizes only: the hero headline and the section
+   titles. Card headings sit at 17-19px, which is body territory, and everything
+   else in the display family — nav items, buttons, eyebrows — is smaller still. */
+[lang="ar"] :is(h1, h2) {
+  font-feature-settings: "rlig" 1, "calt" 1, "liga" 1, "kern" 1, "mark" 1, "mkmk" 1, "ss01" 1;
+}
+
+[lang="ar"],
+[lang="ar"] * {
+  letter-spacing: normal;
+}
+
+[lang="ar"] h1,
+[lang="ar"] h2,
+[lang="ar"] h3,
+[lang="ar"] h4,
+[lang="ar"] h5 {
+  line-height: 1.4;
+}
+
+/* The hero headline sets its own leading, which is far too tight for Arabic. */
+[lang="ar"] .hero-title {
+  line-height: 1.45;
+}
+
+/* Latin runs inside Arabic text — React, PostgreSQL, 04/2026 — keep the Latin
+   face, otherwise Tajawal's fallback renders them noticeably lighter than the
+   same words in the English build. */
+[lang="ar"] .font-mono {
+  font-family: var(--font-mono);
+}

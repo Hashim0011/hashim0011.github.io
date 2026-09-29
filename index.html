@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- The app is client-rendered, so the hero portrait does not exist as a
+         tag until React has mounted. Preloading it starts the download in
+         parallel with the bundle instead of a round trip behind it. -->
+    <link
+      rel="preload"
+      as="image"
+      href="/portrait-560.webp"
+      imagesrcset="/portrait-360.webp 360w, /portrait-560.webp 560w, /portrait-840.webp 840w"
+      imagesizes="(min-width: 1024px) 390px, (min-width: 640px) 340px, 76vw"
+      fetchpriority="high"
+    />
+    <meta name="theme-color" content="#f5f6f8" />
+
+    <script>
+      // Before first paint: a returning visitor who chose dark must not see
+      // the light theme flash first. Light is the default, so only an explicit
+      // "dark" is ever written or read here.
+      try {
+        // ?theme= and ?lang= override the saved choice. A design-import tool or
+        // a screenshot service opens the URL in its own browser, where no
+        // choice has ever been saved, so without this it can only ever reach
+        // the defaults.
+        var q = new URLSearchParams(location.search);
+        var theme = q.get("theme") || localStorage.getItem("theme");
+        var lang = q.get("lang") || localStorage.getItem("locale");
+
+        if (theme === "dark") document.documentElement.dataset.theme = "dark";
+
+        // Louder than a colour flash: laying the page out left-to-right and
+        // then flipping it is far more jarring, so this lands before paint too.
+        if (lang === "ar") {
+          document.documentElement.lang = "ar";
+          document.documentElement.dir = "rtl";
+        }
+      } catch (e) {}
+    </script>
+
+    <title>Hashim Al Masaabi | Software Engineer &amp; Business Analyst</title>
+    <meta
+      name="description"
+      content="Software Engineer and Business Analyst based in Riyadh. I build responsive web products with React and TypeScript, turn business needs into working software, and automate the process in between."
+    />
+    <meta name="author" content="Hashim Al Masaabi" />
+
+    <!-- Link previews.
+         Two rules decide whether a shared link shows a card or just a bare URL:
+         the image must be a format the scrapers decode (JPEG or PNG, never SVG),
+         and every URL here must be absolute. WhatsApp, Telegram, X, LinkedIn
+         and Slack all fetch this markup from their own servers, so a path like
+         "/og-image.jpg" has nothing to resolve against. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Hashim Al Masaabi" />
+    <meta property="og:url" content="%VITE_SITE_URL%/" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="ar_SA" />
+    <meta property="og:title" content="Hashim Al Masaabi | Software Engineer &amp; Business Analyst" />
+    <meta
+      property="og:description"
+      content="React · TypeScript · Node.js · Supabase · n8n. Building products where business requirements meet clean engineering."
+    />
+    <meta property="og:image" content="%VITE_SITE_URL%/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Hashim Al Masaabi, Software Engineer and Business Analyst, Riyadh"
+    />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Hashim Al Masaabi | Software Engineer &amp; Business Analyst" />
+    <meta
+      name="twitter:description"
+      content="React · TypeScript · Node.js · Supabase · n8n. Building products where business requirements meet clean engineering."
+    />
+    <meta name="twitter:image" content="%VITE_SITE_URL%/og-image.jpg" />
+
+    <link rel="canonical" href="%VITE_SITE_URL%/" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Loaded without blocking the first paint. A stylesheet in the head
+         holds rendering until it has been fetched and parsed, which on a phone
+         is a whole round trip to Google before anything appears. Switching the
+         media on load lets the page paint immediately; `display=swap` means the
+         faces then swap in, and the loading curtain hides the swap entirely. -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Tajawal:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Tajawal:wght@400;500;700;800&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
