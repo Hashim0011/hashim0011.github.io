@@ -4,7 +4,7 @@
 
 **Software Engineer & Business Analyst · Riyadh, Saudi Arabia**
 
-[![Live Site](https://img.shields.io/badge/Live-hashim--almasaabi.netlify.app-C8102E?style=for-the-badge&logo=netlify&logoColor=white)](https://hashim-almasaabi.netlify.app)
+[![Live Site](https://img.shields.io/badge/Live-hashim0011.github.io-0FBB7E?style=for-the-badge&logo=githubpages&logoColor=white)](https://hashim0011.github.io)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/hashim-almasaabi-b51ba4353/)
 
 ![React](https://img.shields.io/badge/React_18-20232A?style=flat-square&logo=react&logoColor=61DAFB)
@@ -46,8 +46,8 @@ light and dark themes, and motion that respects accessibility preferences.
 ## Getting Started
 
 ```bash
-git clone https://github.com/Hashim0011/personal-website.git
-cd personal-website
+git clone https://github.com/Hashim0011/hashim0011.github.io.git
+cd hashim0011.github.io
 npm install
 cp .env.example .env
 npm run dev       # http://localhost:5173
@@ -83,9 +83,10 @@ The brand colour is `--color-brand-500` in [`src/index.css`](src/index.css).
 
 ## Deployment
 
-`npm run build` outputs a static `dist/` folder, deployable to Netlify, Vercel,
-Cloudflare Pages, or GitHub Pages. Set `VITE_SITE_URL` in the host's environment
-variables so link previews resolve correctly.
+Every push to `main` builds the site and publishes it to **GitHub Pages** at
+[hashim0011.github.io](https://hashim0011.github.io) through
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). `VITE_SITE_URL` is set in
+that workflow so link previews resolve to the live origin.
 
 ## Contact
 
